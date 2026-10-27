@@ -1,0 +1,43 @@
+# Read by the Agent Control Specification engine inside guardian.py.
+# It says which steps are checked, what part of each step the rules see, and which
+# tools exist. Anything not listed here is denied by the engine itself.
+
+agent_control_specification_version: "0.3.1-beta"
+metadata:
+  name: cortexa-guardian
+
+policies:
+  demo_rules:            # the Python rules in policy.py (class Rules)
+    type: custom
+    adapter: python
+
+intervention_points:
+  input:                 # ACS steps/userMessage: the rules see the message text
+    policy_target: "$.text"
+    policy: { id: demo_rules }
+
+  pre_tool_call:         # ACS steps/toolCallRequest: the rules see the tool arguments
+    policy_target: "$.tool_call.args"
+    policy_target_kind: tool_args
+    tool_name_from: "$.tool_call.name"
+    policy: { id: demo_rules }
+
+  post_tool_call:        # ACS steps/toolCallResult: the rules see the tool output
+    policy_target: "$.tool_result"
+    policy_target_kind: tool_result
+    tool_name_from: "$.tool_call.name"
+    policy: { id: demo_rules }
+
+  output:                # ACS steps/agentResponse: the rules see the final answer
+    policy_target: "$.text"
+    policy: { id: demo_rules }
+
+# The only tools agents may call. Any other tool name is denied with
+# reason "runtime_error:tool_unknown" before the rules run.
+tools:
+  calculator: { type: Tool }
+  ddg: { type: Tool }
+  yfinance_quote: { type: Tool }
+  ask_math_agent: { type: Tool }       # the supervisor's tools in multi_agents.py
+  ask_research_agent: { type: Tool }
+  ask_finance_agent: { type: Tool }

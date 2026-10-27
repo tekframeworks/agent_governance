@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+langchain
+langchain-openai
+ddgs
+yfinance
+python-dotenv
+streamlit
+agent-control-specification==0.3.1b1
